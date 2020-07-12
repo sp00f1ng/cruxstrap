@@ -14,5 +14,5 @@ install: all
 	install -D -m 0755 cruxstrap.in $(DESTDIR)$(BINDIR)/cruxstrap
 
 clean:
-	rm -f boobstrap
+	rm -f cruxstrap
 
