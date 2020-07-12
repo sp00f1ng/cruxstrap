@@ -1,0 +1,43 @@
+CRUXSTRAP utility to install "chroots" with CRUX GNU/Linux distro.
+Similar to debootstrap, pacstrap, dnf --installroot and so on.
+Can be used with any distro, not only on CRUX GNU/Linux.
+
+Dependences:
+
+	None.
+
+Installation:
+
+	# make install
+
+How to use:
+
+Download CRUX installation ISO:
+
+	# wget https://crux.ninja/updated-iso/crux-3.5-updated.iso
+
+Mount it:
+
+	 # mount crux-3.5-updated.iso /mnt
+
+Now you can install selected packages from the directories.
+
+Install full "core":
+
+	# cruxstrap --root CRUX-CHROOT/ --port /mnt/crux/core
+
+Install full "core", "opt" and "xorg":
+
+	# cruxstrap --root CRUX-CHROOT/ \
+		    --port /mnt/crux/core \
+		    --port /mnt/crux/opt \
+		    --port /mnt/crux/xorg
+
+Install only some ports.
+Only selected ports from selected directories will be installed.
+
+	# cruxstrap --root CRUX-CHROOT/ --ports /mnt/crux/core filesystem bash
+
+Full filenames also acceptable:
+
+	# cruxstrap --root CRUX-CHROOT/ /mnt/crux/core/filesystem#*.pkg.tar.xz
