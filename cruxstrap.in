@@ -42,7 +42,7 @@ cruxstrap() {
 
 	while test "$1"; do
 		case "$1" in
-			"--port"|"-p") PORTS="$PORTS $2" ; shift ;;
+			"--ports"|"-p") PORTS="$PORTS $2" ; shift ;;
 			"--root"|"-r") CHROOT="$2" ; shift ;;
 			"--help")
 				cat <<EOF
@@ -50,7 +50,7 @@ $CRUXSTRAP_NAME $CRUXSTRAP_VERSION
 Usage: cruxstrap [options]... [packages]...
 Install selected CRUX ports into directory (chroot).
 
-  -p, --port <directory>     select directory with packages,
+  -p, --ports <directory>    select directory with packages,
                              can be used many times.
 
   -r, --root <directory>     change root directory,
@@ -62,11 +62,19 @@ EOF
 exit 0
 				;;
 			"-"*) echo "invalid option $1" ; exit 1 ;;
-			*) PACKAGES="$PACKAGES $1" ;;
+			*)
+				if test "$CHROOT" = ""; then
+					CHROOT="$1"
+				else
+					PACKAGES="$PACKAGES $1"
+				fi
+				;;
 		esac
 		shift
 	done
-	echo "CRUX GNU/Linux bootstrap [$CHROOT]"
+
+	echo "CRUX GNU/Linux [$CHROOT]" | msg -1
+	hi
 	if test "$PACKAGES" = ""; then
 		for dir in $PORTS; do
 			for prt in "$dir/"*; do
@@ -94,35 +102,65 @@ exit 0
 		done
 	fi
 	if test "$IGNORED"; then
-		echo "Packages ignored because none found."
+		echo "Packages ignored because none found." | msg -1
+		hi
 		for prt in $(echo $IGNORED | tr " " "\n" | sort | uniq | tr "\n" " "); do
-			echo "$prt"
+			echo "$prt" | msg -1 --foreground "Light Red" --highlight
 		done
+		lo
 	fi
 	if test "$INSTALL"; then
-		echo "Packages to install: $(echo $INSTALL | wc -w)"
+		echo "Packages to install: $(echo $INSTALL | wc -w)" | msg -1
 		mkdir -p "$CHROOT/var/lib/pkg"
 		touch "$CHROOT/var/lib/pkg/db"
+		hi
 		for prt in $(echo $INSTALL | tr " " "\n" | sort | uniq | tr "\n" " "); do
 			name="$(basename $prt)"
 			name="${name%%#*}"
 			pkgadd --root "$CHROOT" "$prt"
 			case "$?" in
-				"0") echo "Install: $name" ;;
-				*) echo "Error: $name" ;;
+				"0")
+					echo "$name" | msg -1 --foreground "Light Green"
+					;;
+				*)
+					echo "$name" | msg -1 --foreground "Light Red" --highlight
+					;;
 			esac
 		done
+		lo
+		echo "Done [$CHROOT]" | msg -1
 	else
-		echo "No packages selected. Nothing to do."
+		echo "No packages selected. Nothing to do." | msg -1
 	fi
-	echo "Done [$CHROOT]"
+	lo
+	echo "Done [$CHROOT]" | msg -1
 }
 
 main() {
 	cruxstrap "$@"
 }
 
+hi() {
+	return 0
+}
+
+lo() {
+	return 0
+}
+
+msg() {
+	while read -r input; do
+		echo "$input" >&2
+	done
+}
+
+for BOOTY_CONF in "/etc/booty/booty.conf"; do
+	if test -f "$BOOTY_CONF"; then
+		. "$BOOTY_CONF" || exit 1
+	fi
+done
+
 readonly CRUXSTRAP_NAME="CRUXSTRAP"
-readonly CRUXSTRAP_VERSION="1.0"
+readonly CRUXSTRAP_VERSION="1.1"
 
 main "$@"

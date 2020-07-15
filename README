@@ -24,14 +24,14 @@ Now you can install selected packages from the directories.
 
 Install full "core":
 
-	# cruxstrap --root CRUX-CHROOT/ --port /mnt/crux/core
+	# cruxstrap --root CRUX-CHROOT/ --ports /mnt/crux/core
 
 Install full "core", "opt" and "xorg":
 
 	# cruxstrap --root CRUX-CHROOT/ \
-		    --port /mnt/crux/core \
-		    --port /mnt/crux/opt \
-		    --port /mnt/crux/xorg
+		    --ports /mnt/crux/core \
+		    --ports /mnt/crux/opt \
+		    --ports /mnt/crux/xorg
 
 Install only some ports.
 Only selected ports from selected directories will be installed.
